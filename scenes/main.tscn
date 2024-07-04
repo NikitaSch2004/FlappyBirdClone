@@ -1,0 +1,121 @@
+[gd_scene load_steps=13 format=3 uid="uid://cccdvycfl3cpd"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_drluu"]
+[ext_resource type="PackedScene" uid="uid://xecs78ktfnf1" path="res://scenes/bird.tscn" id="1_wfl5x"]
+[ext_resource type="Texture2D" uid="uid://krm4ojajxd8j" path="res://sprites/base.png" id="2_6nyjc"]
+[ext_resource type="Texture2D" uid="uid://cojhctoyfa26l" path="res://background-day.png" id="4_cslh6"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_m1usf"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_5fwhu"]
+
+[sub_resource type="SystemFont" id="SystemFont_ye3gq"]
+
+[sub_resource type="Animation" id="Animation_qfd45"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:visible_ratio")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_kp0h3"]
+resource_name = "fade-in"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:visible_ratio")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_vov4d"]
+_data = {
+"RESET": SubResource("Animation_qfd45"),
+"fade-in": SubResource("Animation_kp0h3")
+}
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_k0n4r"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4uwmr"]
+
+[node name="main" type="Node2D"]
+script = ExtResource("1_drluu")
+
+[node name="bird" parent="." instance=ExtResource("1_wfl5x")]
+position = Vector2(0, -2)
+
+[node name="Camera2D" type="Camera2D" parent="bird"]
+zoom = Vector2(4, 4)
+
+[node name="ground" type="StaticBody2D" parent="."]
+position = Vector2(0, 56)
+
+[node name="Sprite2D" type="Sprite2D" parent="ground"]
+z_index = 1
+position = Vector2(1, 57)
+texture = ExtResource("2_6nyjc")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ground"]
+position = Vector2(0, 3)
+shape = SubResource("WorldBoundaryShape2D_m1usf")
+
+[node name="Area2D" type="Area2D" parent="ground" groups=["ground"]]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ground/Area2D"]
+shape = SubResource("WorldBoundaryShape2D_5fwhu")
+
+[node name="Timer" type="Timer" parent="."]
+
+[node name="points" type="Label" parent="."]
+z_index = 1
+offset_left = 101.0
+offset_top = -82.0
+offset_right = 144.0
+offset_bottom = -54.0
+theme_override_fonts/font = SubResource("SystemFont_ye3gq")
+theme_override_font_sizes/font_size = 20
+
+[node name="Label2" type="Label" parent="."]
+z_index = 2
+offset_left = -84.0
+offset_top = -82.0
+offset_right = 100.0
+offset_bottom = -54.0
+theme_override_fonts/font = SubResource("SystemFont_ye3gq")
+theme_override_font_sizes/font_size = 20
+text = "Press \"R\" to restart"
+visible_characters = 0
+visible_ratio = 0.0
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Label2"]
+libraries = {
+"": SubResource("AnimationLibrary_vov4d")
+}
+playback_default_blend_time = 10.0
+
+[node name="TouchScreenButton" type="TouchScreenButton" parent="."]
+position = Vector2(0, -2)
+scale = Vector2(14, 8.021)
+texture_pressed = SubResource("ViewportTexture_k0n4r")
+shape = SubResource("RectangleShape2D_4uwmr")
+action = "up"
+
+[node name="Background-day" type="Sprite2D" parent="."]
+z_index = -1
+position = Vector2(1, -77)
+texture = ExtResource("4_cslh6")
+
+[connection signal="script_changed" from="bird" to="." method="_on_bird_script_changed"]
